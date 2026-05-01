@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Ticket — HelpDesk</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/dashboard.html" class="brand">🎫 HelpDesk</a>
+    <div class="navbar-links">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/tickets.html">My Tickets</a>
+      <a id="admin-link" href="/admin.html" style="display:none">Admin</a>
+      <span id="navbar-username" style="color:var(--gray-600);font-size:0.85rem"></span>
+      <button class="btn btn-outline" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width:600px">
+    <div class="card">
+      <h1 class="page-title">Submit New Ticket</h1>
+      <div id="alert-box" class="alert alert-error"></div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="title" placeholder="Brief description of the issue">
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="priority">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM" selected>Medium</option>
+          <option value="HIGH">High</option>
+          <option value="CRITICAL">Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="description" rows="6" placeholder="Describe the issue in detail..."></textarea>
+      </div>
+      <div style="display:flex;gap:1rem">
+        <button class="btn btn-primary" onclick="submitTicket()">Submit Ticket</button>
+        <a href="/dashboard.html" class="btn btn-outline">Cancel</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    requireAuth();
+    renderNavbar();
+
+    async function submitTicket() {
+      const title       = document.getElementById('title').value.trim();
+      const priority    = document.getElementById('priority').value;
+      const description = document.getElementById('description').value.trim();
+      if (!title || !description) return showAlert('alert-box', 'Please fill in all fields');
+      try {
+        await apiPost('/tickets', { title, description, priority }, true);
+        showAlert('alert-box', 'Ticket submitted successfully!', 'success');
+        document.getElementById('alert-box').style.display = 'block';
+        setTimeout(() => window.location.href = '/dashboard.html', 1500);
+      } catch (e) {
+        showAlert('alert-box', 'Failed to submit ticket. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>
